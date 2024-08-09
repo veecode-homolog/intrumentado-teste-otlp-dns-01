@@ -8,23 +8,17 @@ metadata:
     ingress_type: kong
     certificate_account_email: platformss@vee.codes
     certificate_environment_type: production
+    public_ip: 34.230.96.207
   annotations:
     github.com/project-slug: veecode-homolog/intrumentado-teste-otlp-dns-01
     grafana/dashboard-selector: intrumentado-teste-otlp-dns-01
     grafana/alert-label-selector: "alertname=intrumentado-teste-otlp-dns-01"
-    infracost/project: intrumentado-teste-otlp-dns-01 
+    infracost/project: intrumentado-teste-otlp-dns-01
     backstage.io/techdocs-ref: dir:..
-    github.com/workflows: terraform-deploy.yml,start-instance.yml,stop-instance.yml,kubeconfig.yml,terraform-destroy.yml,infracost.yml   
-    cluster/instructions: |
-      ssh -i ./key-pair.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} 
-      "mkdir -p .kube && k3d kubeconfig get ${CLUSTER_NAME} > ~/.kube/config"
-      scp -i ./key-pair.pem ${EC2_USER}@${EC2_HOST}:~/.kube/config ./config
-      yq e 'del(.clusters[0].cluster.certificate-authority-data)' -i ~/.kube/config
-      yq e '.clusters[0].cluster.insecure-skip-tls-verify=true' config -i
-      yq e '.clusters[0].cluster.server = "https://${EC2_HOST}:38517"' config -i
+    github.com/workflows: terraform-deploy.yml,start-instance.yml,stop-instance.yml,kubeconfig.yml,terraform-destroy.yml,infracost.yml
+    cluster/instructions: "# Run the following commands to import the kubeconfig:\n  ssh -i ./cert.pem -o StrictHostKeyChecking=no $USERNAME@$34.230.96.207 \"mkdir -p .kube && k3d kubeconfig get k3s > ~/.kube/config\"\n  scp -i ./cert.pem $USERNAME@$34.230.96.207:~/.kube/config ~/.kube/config-intrumentado-teste-otlp-dns-01\n  yq -e 'del(.clusters[0].cluster.certificate-authority-data) | .clusters[0].cluster.insecure-skip-tls-verify=true | .clusters[].cluster.server |= sub(\"0.0.0.0\", \"34.230.96.207\")' -i ~/.kube/config-intrumentado-teste-otlp-dns-01\n  export KUBECONFIG=~/.kube/config-intrumentado-teste-otlp-dns-01\n  kubectl get pods -A\n"
 spec:
   type: ec2
   lifecycle: experimental
   owner: "group:default/admin"
   environment: 'environment:default/pet-environment-homolog'
-  
